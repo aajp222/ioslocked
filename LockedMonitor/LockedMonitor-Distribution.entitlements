@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- family-controls omitted until Apple approves it for distribution; see
+	     Locked/Locked-Distribution.entitlements. This extension ships inert
+	     until then — iOS never invokes it without the entitlement. -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.aaryanpanchal.locked</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- TestFlight and the App Store use the PRODUCTION APNs environment. A
+	     development value here means Apple hands out sandbox tokens that the
+	     production push host rejects, and notifications fail silently. -->
+	<key>aps-environment</key>
+	<string>production</string>
+
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.aaryanpanchal.locked</string>
+	</array>
+
+	<!-- com.apple.developer.family-controls is deliberately ABSENT.
+	     Apple grants it for development automatically, but distribution needs
+	     approval: https://developer.apple.com/contact/request/family-controls-distribution
+	     Until that lands, an upload carrying it fails validation. The app
+	     handles its absence — Settings reports "Screen Time access not granted"
+	     and sessions run on the honour system.
+
+	     When approval arrives: add
+	         <key>com.apple.developer.family-controls</key><true/>
+	     here and to the two -Distribution files in LockedMonitor/ and
+	     LockedShield/, then archive again. -->
+</dict>
+</plist>
