@@ -1,0 +1,14 @@
+# This repository is nested inside the parent project, and git does not read a
+# parent's .gitignore across a repository boundary — so the rules that already
+# exist one level up have to be restated here to have any effect. That gap is
+# how 15MB of archive, dSYMs and a signed .ipa came to be tracked in the first
+# place.
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+
+# Xcode project is generated from project.yml by `xcodegen generate`.
+# Left tracked for now: it is what `open Locked.xcodeproj` needs on a fresh
+# clone before xcodegen has run.
