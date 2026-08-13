@@ -187,7 +187,30 @@ struct Session: Identifiable, Codable, Hashable {
     var plannedMinutes: Int
     var startedAt: Date
     var endsAt: Date
-    var blocked: [String]
+
+    /// How many apps iOS actually sealed, as ManagedSettings reported it when
+    /// the session started.
+    ///
+    /// Replaces `blocked: [String]`, which held the names from the chip list.
+    /// Nothing ever read those names — every call site asked for `.count` — and
+    /// they described a selection iOS was not enforcing.
+    ///
+    /// Optional so that sessions written by the old build still decode. That is
+    /// load-bearing rather than tidy: `AppData.history` is `[Session]`, and a
+    /// synthesised `Codable` throws on a missing non-optional key, so one
+    /// undecodable session would take the whole file — feed, streak, profile,
+    /// pending uploads — down with it and `load` would hand back a blank app.
+    var blockedCount: Int? = nil
+
+    /// The Orbit task this session was locked against, when it came from one.
+    ///
+    /// Nil for a goal typed by hand, which is most of them. Deliberately never
+    /// sent to the pod server: `RemotePodService.openSession` maps its fields
+    /// one by one rather than encoding this struct, so the id stays on the
+    /// phone. Keep it that way — the pod needs to know what you said you'd do,
+    /// not which row of your task list it came from.
+    var orbitTaskID: UUID? = nil
+
     var stake: Stake
     /// Set when the pod grants a break — the shield lifts but the clock keeps running.
     var breakUntil: Date? = nil
@@ -195,6 +218,9 @@ struct Session: Identifiable, Codable, Hashable {
     var requestsSent: Int = 0
 
     enum Outcome: String, Codable { case running, completed, caved }
+
+    /// Always a number, whatever shape the stored session was written in.
+    var sealedCount: Int { blockedCount ?? 0 }
 
     var plannedSeconds: Int { plannedMinutes * 60 }
 
@@ -228,36 +254,32 @@ struct Profile: Codable {
     var weeklySeconds = 0
     var bankedMinutes = 0
     var cavesThisWeek = 0
-    var globalTotal = 214_900
     /// So a streak counts days, not sessions.
     var lastCompletedDay: Date? = nil
 
     var firstName: String { name.split(separator: " ").first.map(String.init) ?? name }
 
-    /// Where you'd sit on a global board. Derived from hours locked this week so
-    /// the number actually moves; swap for a server value when you have one.
-    var globalRank: Int {
-        let tau = 2.55 * 3600
-        let fraction = exp(-Double(weeklySeconds) / tau)
-        return max(1, min(globalTotal, Int(Double(globalTotal) * fraction)))
-    }
-
-    var globalPercentile: Int {
-        max(1, Int((Double(globalRank) / Double(globalTotal) * 100).rounded(.up)))
-    }
+    // `globalRank`, `globalPercentile` and `globalTotal` used to live here.
+    // They were `exp(-weeklySeconds / 2.55h)` against a hardcoded population of
+    // 214,900 — a plausible-looking number that moved when you locked your
+    // phone and was, start to finish, invented. The server derives hours from
+    // session records precisely so the app cannot make them up; a fabricated
+    // leaderboard on top of that undoes the argument.
+    //
+    // If a real global board is ever wanted, it comes from `db.derive_stats`
+    // across accounts, like every other number the pod screen shows.
 }
 
-// MARK: - App toggles
+// The `AppToggle` chip list from the prototype used to live here, with a seeded
+// cast of Instagram / TikTok / X / YouTube / Reddit / Snapchat.
 //
-// The chip list from the prototype. When the Screen Time entitlement is live
-// these are replaced by real ApplicationTokens from FamilyActivityPicker —
-// see Blocking.swift.
-
-struct AppToggle: Identifiable, Codable, Hashable {
-    var id: String { name }
-    var name: String
-    var on: Bool
-}
+// It was a second, fictional source of truth for the product's central claim,
+// sitting directly above the real one in the same panel — `Blocking.swift` said
+// so outright: "The chips above are just the label your pod sees." Once Apple
+// approved the Family Controls entitlement, the honest answer to "what is
+// blocked" became whatever `FamilyActivitySelection` holds, which is opaque
+// tokens the app is never allowed to name. So there is nothing to list, and a
+// count is the only true thing that can be said.
 
 /// A finished session waiting to be uploaded.
 struct PendingSession: Codable, Identifiable, Hashable {
@@ -277,7 +299,6 @@ struct AppData: Codable {
     var me = Profile()
     var members: [PodMember] = []
     var feed: [FeedEvent] = []
-    var apps: [AppToggle] = AppToggle.seed
     var stake: Stake = .post
     var lastGoal = "Finish the problem set"
     var lastMinutes = 90
@@ -296,6 +317,9 @@ struct AppData: Codable {
     /// Dev mode: a simulated pod of actors, for demos and testing. Off unless
     /// explicitly switched on in Settings.
     var devMode = false
+    /// The Lock Screen card and Dynamic Island. On by default — it's the thing
+    /// that makes a session feel held — but some people want their island back.
+    var liveActivityEnabled = true
 
     var pod: [PodMember] { members.filter(\.inPod) }
 }
@@ -340,19 +364,6 @@ extension FeedEvent {
             FeedEvent(authorName: "Priya", authorInitials: "PR",
                       kind: .finished(seconds: 150 * 60, streak: 12, goal: "grade the midterms"),
                       date: at(9, 5)),
-        ]
-    }
-}
-
-extension AppToggle {
-    static var seed: [AppToggle] {
-        [
-            AppToggle(name: "Instagram", on: true),
-            AppToggle(name: "TikTok", on: true),
-            AppToggle(name: "X", on: true),
-            AppToggle(name: "YouTube", on: true),
-            AppToggle(name: "Reddit", on: true),
-            AppToggle(name: "Snapchat", on: false),
         ]
     }
 }

@@ -17,7 +17,6 @@ struct StandingsView: View {
                 .padding(.bottom, 8)
 
                 board
-                globalCard
                 if !state.data.history.isEmpty { historyCard }
             }
             .padding(.horizontal, 20)
@@ -65,40 +64,10 @@ struct StandingsView: View {
         .glass(26, fill: 0.11, border: 0.14)
     }
 
-    private var globalCard: some View {
-        Panel(radius: 26, padding: 20, fill: 0.09) {
-            Kicker(text: "Everyone on Locked", color: Ink.paper(0.42))
-                .padding(.bottom, 14)
-
-            HStack(alignment: .lastTextBaseline, spacing: 8) {
-                Text("#\(state.me.globalRank.formatted())")
-                    .font(.display(44))
-                    .foregroundStyle(Ink.paper)
-                    .monospacedDigit()
-                Text("of \(state.me.globalTotal.formatted())")
-                    .font(.ui(12.5))
-                    .foregroundStyle(Ink.paper(0.45))
-            }
-            .padding(.bottom, 6)
-
-            Text(globalNote)
-                .font(.ui(12.5))
-                .foregroundStyle(Ink.paper(0.45))
-                .lineSpacing(2)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-
-    private var globalNote: String {
-        let percentile = state.me.globalPercentile
-        if state.weekTotal < 300 {
-            return "Nothing logged this week. You are, statistically, everyone's warning story."
-        }
-        if percentile >= 60 {
-            return "Bottom half of everyone. Lock something long enough to move."
-        }
-        return "Top \(percentile)%. Which sounds better than \(state.myPodRank)\(Fmt.ordinal(state.myPodRank)) of \(state.podSize)."
-    }
+    // The "Everyone on Locked" card was here: a global rank out of 214,900
+    // people, both numbers invented. The pod board above it is real — the
+    // server derives those hours from session records — and putting a fiction
+    // directly beneath it taught you to read both the same way.
 
     private var historyCard: some View {
         Panel(radius: 26, padding: 20, fill: 0.09) {

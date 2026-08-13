@@ -246,11 +246,11 @@ struct RealAppPicker: View {
     private var footnote: String {
         switch shield.state {
         case .ready:
-            return "iOS enforces this. The chips above are just the label your pod sees."
+            return "iOS enforces this. Your pod sees the count, never the names — apps are never told which apps you picked."
         case .noSelection:
-            return "Screen Time access granted. Pick the apps iOS should actually seal off."
+            return "Screen Time access granted. Pick the apps iOS should seal off."
         case .needsPermission:
-            return "Needs Apple's Family Controls entitlement on this build. Until then the list below is honour-system: the pod still sees it, iOS doesn't enforce it."
+            return "Needs Apple’s Family Controls entitlement on this build. Until it lands, a session runs on the honour system — the timer, the pod and the stakes are real, the block is not."
         case .denied:
             return "Screen Time access was declined. Re-enable it in Settings › Screen Time to make the lock real."
         case .unsupported:

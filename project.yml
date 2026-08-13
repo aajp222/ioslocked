@@ -39,6 +39,10 @@ targets:
     sources:
       - path: Locked
       - path: Shared
+      # The Orbit seam. Deliberately not in Shared/ — that directory is
+      # compiled into all three extensions, and the shield has no business
+      # holding a task list. The app alone talks to Orbit.
+      - path: "../../../Locked X Orbit/Bridge/OrbitBridge.swift"
     dependencies:
       - target: LockedWidgets
       - target: LockedMonitor
@@ -51,10 +55,17 @@ targets:
       path: Locked/Info.plist
       properties:
         CFBundleDisplayName: Locked
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
         UILaunchScreen: {}
         UIUserInterfaceStyle: Dark
         UIStatusBarStyle: UIStatusBarStyleLightContent
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         NSUserNotificationsUsageDescription: "Locked notifies you when a session ends and when your pod answers an unlock request."
         NSSupportsLiveActivities: true
         NSSupportsLiveActivitiesFrequentUpdates: true
@@ -76,6 +87,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aaryanpanchal.locked
         PRODUCT_NAME: Locked
+        TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
       configs:

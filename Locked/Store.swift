@@ -100,15 +100,15 @@ final class AppState: ObservableObject {
         // A session may have finished while the app was dead.
         settleSession()
 
-        if let session = data.session, session.outcome == .running {
+        if let session = data.session, session.outcome == .running, data.liveActivityEnabled {
             // Cold launch mid-session: take over the Live Activity that's
             // already on the Lock Screen rather than starting a second one.
             publishSnapshot()
             live.resume(
-                goal: session.goal,
-                podNames: pod.map(\.name),
-                blockedCount: session.blocked.count,
-                plannedMinutes: session.plannedMinutes,
+                    goal: session.goal,
+                    podNames: pod.map(\.name),
+                    blockedCount: session.sealedCount,
+                    plannedMinutes: session.plannedMinutes,
                 startedAt: session.startedAt,
                 endsAt: session.endsAt,
                 breakUntil: session.breakUntil,
@@ -184,7 +184,12 @@ final class AppState: ObservableObject {
         }
     }
 
-    var blockedNames: [String] { data.apps.filter(\.on).map(\.name) }
+    /// How many apps and categories iOS will actually seal.
+    ///
+    /// Reads the live `FamilyActivitySelection` rather than a stored list. The
+    /// tokens behind it are opaque by design — an app is never told which apps
+    /// you picked — so a count is the whole of what can honestly be shown.
+    var sealedCount: Int { shield.selectedCount }
 
     // MARK: Clock
 
@@ -371,6 +376,14 @@ final class AppState: ObservableObject {
             servedSeconds: served,
             tzOffsetMinutes: timeZoneOffsetMinutes
         ))
+
+        // And back to Orbit, if this session came from a task there. It rides
+        // here rather than in `completeSession` and `cave` because this is
+        // already the one place a finished session fans out — which also means
+        // the settle-on-relaunch path, where a session ended while the app was
+        // dead, is covered without knowing it exists.
+        OrbitLink.record(session, outcome: outcome, served: served, at: clock())
+
         save()
         flushSessions()
     }
@@ -395,6 +408,29 @@ final class AppState: ObservableObject {
     }
 
     // MARK: Dev mode
+
+    /// Turn the Lock Screen timer on or off. Off ends whatever is showing now.
+    func setLiveActivity(_ on: Bool) {
+        data.liveActivityEnabled = on
+        if on {
+            if let session, session.outcome == .running {
+                live.resume(
+                    goal: session.goal,
+                    podNames: pod.map(\.name),
+                    blockedCount: session.sealedCount,
+                    plannedMinutes: session.plannedMinutes,
+                    startedAt: session.startedAt,
+                    endsAt: session.endsAt,
+                    breakUntil: session.breakUntil,
+                    requestsSent: session.requestsSent
+                )
+            }
+        } else {
+            live.end()
+        }
+        Haptics.select()
+        save()
+    }
 
     /// Fill the pod with actors, or clear them out again.
     ///
@@ -557,14 +593,15 @@ final class AppState: ObservableObject {
 
     // MARK: Sessions
 
-    func startSession(goal: String, minutes: Int, stake: Stake) {
+    func startSession(goal: String, minutes: Int, stake: Stake, orbitTaskID: UUID? = nil) {
         let start = clock()
         let session = Session(
             goal: goal.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Work" : goal,
             plannedMinutes: minutes,
             startedAt: start,
             endsAt: start.addingTimeInterval(Double(minutes) * 60),
-            blocked: blockedNames,
+            blockedCount: sealedCount,
+            orbitTaskID: orbitTaskID,
             stake: stake
         )
 
@@ -577,14 +614,16 @@ final class AppState: ObservableObject {
 
         shield.engage(window: session.startedAt...session.endsAt)
         publishSnapshot()
-        live.start(
+        if data.liveActivityEnabled {
+            live.start(
             goal: session.goal,
             podNames: pod.map(\.name),
-            blockedCount: session.blocked.count,
+            blockedCount: session.sealedCount,
             plannedMinutes: session.plannedMinutes,
-            startedAt: session.startedAt,
-            endsAt: session.endsAt
-        )
+                startedAt: session.startedAt,
+                endsAt: session.endsAt
+            )
+        }
         Notifier.scheduleSessionEnd(at: session.endsAt, goal: session.goal)
         if service.isRemote {
             Task { [service, offset = timeZoneOffsetMinutes] in
@@ -660,12 +699,12 @@ final class AppState: ObservableObject {
         outgoing = .none
         showCaveSheet = false
 
-        let event = FeedEvent(
+        // Published bare. Whatever the pod says about it, they say themselves —
+        // see the note where `pileOn` used to be.
+        addFeed(FeedEvent(
             authorName: data.me.name, authorInitials: data.me.initials, isMe: true,
             kind: .caved(remaining: left, goal: s.goal, reason: nil)
-        )
-        addFeed(event)
-        pileOn(event.id)
+        ))
 
         shield.standDown()
         live.end()
@@ -678,18 +717,17 @@ final class AppState: ObservableObject {
         nudgeSync()
     }
 
-    /// The pod piling on after a failure — arrives a beat later, like real people.
-    private func pileOn(_ eventID: UUID) {
-        Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 1_800_000_000)
-            guard let self else { return }
-            guard let i = self.data.feed.firstIndex(where: { $0.id == eventID }) else { return }
-            self.data.feed[i].shame = max(1, self.pod.count)
-            self.data.feed[i].comment = ["lmao", "four. minutes.", "predictable", "we all saw it"].randomElement()
-            self.data.feed[i].commentAuthor = self.pod.randomElement()?.name ?? "Dev"
-            self.save()
-        }
-    }
+    // `pileOn` used to live here. It waited 1.8 seconds after a real cave and
+    // then wrote a comment — "lmao", "four. minutes." — attributed to a random
+    // real member of your pod, plus a shame count for reactions nobody had made.
+    //
+    // It was not behind dev mode. It ran on live pods, putting words in the
+    // mouths of actual people and showing them to those same people in the
+    // shared feed. In an app whose entire argument is that self-reported
+    // accountability is not accountability, inventing the pod's reaction is the
+    // one thing it cannot do. `fetchFeed` already delivers the real thing.
+    //
+    // If a cave lands to silence, that is information about your pod.
 
     // MARK: Begging
 
@@ -856,13 +894,6 @@ final class AppState: ObservableObject {
         save()
     }
 
-    func toggleApp(_ app: AppToggle) {
-        guard let i = data.apps.firstIndex(where: { $0.id == app.id }) else { return }
-        data.apps[i].on.toggle()
-        Haptics.select()
-        save()
-    }
-
     func finishOnboarding() {
         data.hasOnboarded = true
         Haptics.success()
@@ -936,7 +967,7 @@ final class AppState: ObservableObject {
             endsAt: session.endsAt,
             breakUntil: session.breakUntil,
             podNames: pod.map(\.name),
-            blockedCount: session.blocked.count,
+            blockedCount: session.sealedCount,
             ownerName: data.me.firstName
         ).save()
     }

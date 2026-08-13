@@ -13,21 +13,20 @@
 		<string>Default</string>
 	</array>
 
+	<!-- Family Controls (Distribution), approved by Apple 6 Aug 2026. This is
+	     what makes the block real for people who install from TestFlight rather
+	     than from Xcode. -->
+	<key>com.apple.developer.family-controls</key>
+	<true/>
+
+	<!-- Kept in step with Locked.entitlements. These two files drifting apart
+	     is the classic version of this bug: the bridge works from Xcode and is
+	     silently absent on TestFlight, where nothing errors and the goal chips
+	     just never change. -->
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.aaryanpanchal.locked</string>
+		<string>group.com.aaryanpanchal.orbitlocked</string>
 	</array>
-
-	<!-- com.apple.developer.family-controls is deliberately ABSENT.
-	     Apple grants it for development automatically, but distribution needs
-	     approval: https://developer.apple.com/contact/request/family-controls-distribution
-	     Until that lands, an upload carrying it fails validation. The app
-	     handles its absence — Settings reports "Screen Time access not granted"
-	     and sessions run on the honour system.
-
-	     When approval arrives: add
-	         <key>com.apple.developer.family-controls</key><true/>
-	     here and to the two -Distribution files in LockedMonitor/ and
-	     LockedShield/, then archive again. -->
 </dict>
 </plist>

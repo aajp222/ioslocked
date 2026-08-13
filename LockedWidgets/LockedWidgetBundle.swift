@@ -59,14 +59,24 @@ struct LockedLiveActivity: Widget {
                 // presentation, where a countdown wouldn't fit.
                 EmptyView()
             } compactTrailing: {
-                countdown(context, size: 12)
-                    .foregroundStyle(Ink.gold)
+                emptyingRing(context)
             } minimal: {
-                Image(systemName: "lock")
-                    .foregroundStyle(Ink.gold)
+                emptyingRing(context)
             }
             .keylineTint(Ink.gold)
         }
+    }
+
+    /// The least intrusive thing that still says "you are locked": a ring that
+    /// drains. No digits, so the pill stays as narrow as iOS allows.
+    private func emptyingRing(_ context: ActivityViewContext<LockedActivityAttributes>) -> some View {
+        ProgressView(timerInterval: context.state.range, countsDown: true) {
+            EmptyView()
+        } currentValueLabel: {
+            EmptyView()
+        }
+        .progressViewStyle(.circular)
+        .tint(Ink.gold)
     }
 
     private func countdown(_ context: ActivityViewContext<LockedActivityAttributes>, size: CGFloat) -> some View {

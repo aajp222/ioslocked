@@ -51,6 +51,7 @@ struct SettingsView: View {
                     stakesPanel
                     podPanel
                     blockingPanel
+                    orbitPanel
                     notificationsPanel
                     devPanel
                     dangerPanel
@@ -509,6 +510,45 @@ struct SettingsView: View {
         }
     }
 
+    /// Read-only, and deliberately so. There is nothing to configure — the
+    /// bridge is on when both apps are installed and off otherwise. It exists
+    /// because the failure is silent by nature: no goal chips look exactly like
+    /// no tasks in Orbit, and "my tasks aren't showing up" deserves an answer
+    /// that isn't a shrug.
+    private var orbitPanel: some View {
+        Panel(radius: 24, padding: 18) {
+            HStack(alignment: .firstTextBaseline) {
+                Kicker(text: "Orbit")
+                Spacer()
+                Text(orbitStatus)
+                    .font(.ui(11.5))
+                    .foregroundStyle(OrbitLink.isAvailable ? Ink.gold : Ink.paper(0.4))
+            }
+            .padding(.bottom, 10)
+
+            Text(orbitNote)
+                .font(.ui(11.5))
+                .foregroundStyle(Ink.paper(0.38))
+                .lineSpacing(2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var orbitStatus: String {
+        guard OrbitLink.isAvailable else { return "Not connected" }
+        let count = OrbitLink.suggestions().count
+        return count == 0 ? "Nothing waiting" : "\(count) task\(count == 1 ? "" : "s")"
+    }
+
+    private var orbitNote: String {
+        guard OrbitLink.isAvailable else {
+            return "Install Orbit on this phone and its top tasks become your goal options. Nothing leaves the device."
+        }
+        return OrbitLink.suggestions().isEmpty
+            ? "Orbit is connected but has nothing due. Open it to refresh, or type a goal yourself."
+            : "Orbit's top tasks appear as goals when you start a session. Time served goes back to it; nothing else does."
+    }
+
     private var notificationsPanel: some View {
         Panel(radius: 24, padding: 18) {
             HStack(alignment: .firstTextBaseline) {
@@ -532,11 +572,32 @@ struct SettingsView: View {
             HStack(alignment: .firstTextBaseline) {
                 Kicker(text: "Lock Screen timer")
                 Spacer()
-                Text(state.live.status)
+                Text(state.data.liveActivityEnabled ? state.live.status : "Off")
                     .font(.ui(11.5))
-                    .foregroundStyle(state.live.isRunning ? Ink.gold : Ink.paper(0.4))
+                    .foregroundStyle(state.data.liveActivityEnabled && state.live.isRunning ? Ink.gold : Ink.paper(0.4))
                     .multilineTextAlignment(.trailing)
             }
+            .padding(.bottom, 10)
+
+            Text("A card on the Lock Screen and a ring in the Dynamic Island while you're locked. The island can't be made smaller than the sensor housing, so turn this off if you'd rather have it back.")
+                .font(.ui(11.5))
+                .foregroundStyle(Ink.paper(0.4))
+                .lineSpacing(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.bottom, 10)
+
+            Button {
+                Haptics.tap()
+                state.setLiveActivity(!state.data.liveActivityEnabled)
+            } label: {
+                Text(state.data.liveActivityEnabled ? "Turn the Lock Screen timer off" : "Turn the Lock Screen timer on")
+                    .font(.display(14, .semibold))
+                    .foregroundStyle(state.data.liveActivityEnabled ? Ink.paper : Ink.goldType)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .modifier(ActionSkin(gold: !state.data.liveActivityEnabled))
+            }
+            .pressable()
             .padding(.bottom, 12)
 
             Button {

@@ -15,6 +15,7 @@
 		2222A039519EC792FE336A66 /* LockedMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CB52E8A1A837955A4A7D8DFE /* LockedMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		229AA615F637FF1533D8C702 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54E1DF886E2636738DBA561 /* Components.swift */; };
 		27E70A18D7FBAB6701F8A1BE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB49EF4436DC469D3587C7D /* WidgetKit.framework */; };
+		30CB99345D93474C824F2276 /* OrbitBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93459C34671E0E000958532E /* OrbitBridge.swift */; };
 		34E47BA36739894AE9BB42F2 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8570A40C8E754E208DAA81EE /* ActivityKit.framework */; };
 		383F59CB919304E7489F7CE5 /* ManagedSettingsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77F96E80ACEE7BF5D60E4F8F /* ManagedSettingsUI.framework */; };
 		38AB8708DC3A8851443243BC /* LockedWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DDF3D2EAE99270B379F55C2C /* LockedWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -22,6 +23,7 @@
 		4A559837A9EE232C209F7602 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4AC8FEF912182067798C4A0 /* DeviceActivity.framework */; };
 		4DDB45C76ED20C2FFFB491F9 /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B8B5CFE75DC4C160478F13 /* FamilyControls.framework */; };
 		4FDD04D1B582AB30634CD179 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A7298673CA7BC9F049A2C0 /* ManagedSettings.framework */; };
+		5379EC29FDB4F7BCFDBF95DA /* OrbitBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867CEB8A2606C8FD0B2FD0EB /* OrbitBridgeTests.swift */; };
 		5578338933D8E6D5E07B21EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4A858FBA5D3CB32059055B88 /* Assets.xcassets */; };
 		561E79961CCBB8901E3A3ACA /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB5C6CDBE854E1443BB1CA3 /* FeedView.swift */; };
 		56B1E99AAB42483E40BEE4C0 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282418E01A087EDF909E8321 /* RootView.swift */; };
@@ -46,6 +48,7 @@
 		9B36CE2E2EADD74852556792 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8570A40C8E754E208DAA81EE /* ActivityKit.framework */; };
 		9E13FB58C3351A0C895CA04A /* Palette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E80C59C526FD8F076C8631 /* Palette.swift */; };
 		A5246081291207C9C48406D8 /* Palette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E80C59C526FD8F076C8631 /* Palette.swift */; };
+		A5415324AEC0D33F65A26FBD /* OrbitLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 343742C139EE8DDD66D27C4C /* OrbitLink.swift */; };
 		B4D229719E8942731549DAEC /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76332E7F463EB739FC405F70 /* Haptics.swift */; };
 		B855100CCC43C2FE89F540C8 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A7298673CA7BC9F049A2C0 /* ManagedSettings.framework */; };
 		C1EA6864D8B6BDC0A263B22B /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B668CE209498BEB508CB9C /* Models.swift */; };
@@ -123,6 +126,7 @@
 		2AC76F4F84DFB2735C36B05D /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		2DADCA45C52579D48297C3B3 /* LockedWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockedWidgetBundle.swift; sourceTree = "<group>"; };
 		2E957AD131F0F4EE94BD52A3 /* LockedTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LockedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		343742C139EE8DDD66D27C4C /* OrbitLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitLink.swift; sourceTree = "<group>"; };
 		3F7EADEDDB6BEDDF30BBB664 /* PushRegistrar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushRegistrar.swift; sourceTree = "<group>"; };
 		451B5C21EA24C563A3721BBD /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		4537F4EFB6B4CAC41C26A1E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -143,8 +147,10 @@
 		81B668CE209498BEB508CB9C /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		833E3454AA5B463E3CD3E093 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8570A40C8E754E208DAA81EE /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
+		867CEB8A2606C8FD0B2FD0EB /* OrbitBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitBridgeTests.swift; sourceTree = "<group>"; };
 		88E80C59C526FD8F076C8631 /* Palette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Palette.swift; sourceTree = "<group>"; };
 		8E2BEC2B39F6A155210D0C6D /* LockedWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LockedWidgets.entitlements; sourceTree = "<group>"; };
+		93459C34671E0E000958532E /* OrbitBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitBridge.swift; sourceTree = "<group>"; };
 		963D776EF27C4AC00CA83D82 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
 		96A7298673CA7BC9F049A2C0 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 		A33B1E395A35E5E0FB177041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -213,6 +219,7 @@
 		098D9EF7D2DF300727E3FC5B = {
 			isa = PBXGroup;
 			children = (
+				446A163390C71112E5937F83 /* aaryanpanchal */,
 				D8F2C27EA28E46FDD63E2010 /* Locked */,
 				957199114C79A9D17DA05933 /* LockedMonitor */,
 				85CBECC30C5A8A16ACC851A4 /* LockedShield */,
@@ -246,14 +253,40 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		239B1926381528C394A1322D /* Locked X Orbit */ = {
+			isa = PBXGroup;
+			children = (
+				602D42A6FAD89550F398CA67 /* Bridge */,
+			);
+			path = "Locked X Orbit";
+			sourceTree = "<group>";
+		};
 		365B4019561EF0DEEA87283E /* LockedTests */ = {
 			isa = PBXGroup;
 			children = (
 				963D776EF27C4AC00CA83D82 /* AppStateTests.swift */,
 				726BBBEE8C16C627B8507C58 /* ModelTests.swift */,
+				867CEB8A2606C8FD0B2FD0EB /* OrbitBridgeTests.swift */,
 				B7968F8C126B3A8999F13E0C /* PushHandlingTests.swift */,
 			);
 			path = LockedTests;
+			sourceTree = "<group>";
+		};
+		446A163390C71112E5937F83 /* aaryanpanchal */ = {
+			isa = PBXGroup;
+			children = (
+				239B1926381528C394A1322D /* Locked X Orbit */,
+			);
+			name = aaryanpanchal;
+			path = ../../..;
+			sourceTree = "<group>";
+		};
+		602D42A6FAD89550F398CA67 /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				93459C34671E0E000958532E /* OrbitBridge.swift */,
+			);
+			path = Bridge;
 			sourceTree = "<group>";
 		};
 		748EC28A32CB5957B78BE8DA /* Frameworks */ = {
@@ -316,6 +349,7 @@
 				F64E63C86A7C17001D806C40 /* LockedApp.swift */,
 				81B668CE209498BEB508CB9C /* Models.swift */,
 				1A2B4B20593024B88AAE7ADC /* Notifications.swift */,
+				343742C139EE8DDD66D27C4C /* OrbitLink.swift */,
 				603E51E4575AA09BE15F3216 /* PodService.swift */,
 				1AF1AF95A5045B9460541F0C /* PrivacyInfo.xcprivacy */,
 				3F7EADEDDB6BEDDF30BBB664 /* PushRegistrar.swift */,
@@ -544,6 +578,7 @@
 			files = (
 				EAEB0C2C9773C3227DCA6B15 /* AppStateTests.swift in Sources */,
 				5D27D87565EC43E0964FB1DA /* ModelTests.swift in Sources */,
+				5379EC29FDB4F7BCFDBF95DA /* OrbitBridgeTests.swift in Sources */,
 				DAEBC00C6C9AAE8C9ED8490E /* PushHandlingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -565,6 +600,8 @@
 				C1EA6864D8B6BDC0A263B22B /* Models.swift in Sources */,
 				CBF3AEE69631ACB9A2151FDB /* Notifications.swift in Sources */,
 				F5918440537DF8D3520F91B9 /* OnboardingView.swift in Sources */,
+				30CB99345D93474C824F2276 /* OrbitBridge.swift in Sources */,
+				A5415324AEC0D33F65A26FBD /* OrbitLink.swift in Sources */,
 				8DADC3193CE9613815F910B9 /* Palette.swift in Sources */,
 				74FB05232D6464951DCF079D /* PodService.swift in Sources */,
 				7EE102DB91128A8539E4EF0A /* PushRegistrar.swift in Sources */,
@@ -619,7 +656,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.aaryanpanchal.locked;
 				PRODUCT_NAME = Locked;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -709,7 +746,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.aaryanpanchal.locked;
 				PRODUCT_NAME = Locked;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};

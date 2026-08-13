@@ -9,6 +9,15 @@ struct StartSessionView: View {
     @State private var minutes = 90
     @FocusState private var goalFocused: Bool
 
+    /// Orbit's shortlist, read once when the screen opens. Empty whenever Orbit
+    /// isn't installed, hasn't run, or its plan has gone stale.
+    @State private var orbitTasks: [OrbitBridge.FocusCandidate] = []
+
+    /// Which of them this session is against, if any. Cleared the moment the
+    /// goal stops matching, so a receipt can never credit time to a task whose
+    /// name you edited away.
+    @State private var pickedTaskID: UUID?
+
     var body: some View {
         ZStack(alignment: .bottom) {
             LockedBackground()
@@ -37,7 +46,12 @@ struct StartSessionView: View {
             VStack(spacing: 0) {
                 GoldButton(title: "Lock it", radius: 20, vertical: 17) {
                     Haptics.seal()
-                    state.startSession(goal: goal, minutes: minutes, stake: state.data.stake)
+                    state.startSession(
+                        goal: goal,
+                        minutes: minutes,
+                        stake: state.data.stake,
+                        orbitTaskID: pickedTaskID
+                    )
                     dismiss()
                 }
             }
@@ -47,6 +61,9 @@ struct StartSessionView: View {
         .onAppear {
             goal = state.data.lastGoal
             minutes = state.data.lastMinutes
+            // Read once, on open. Re-reading while the sheet is up would let
+            // the chips change under a finger already moving toward one.
+            orbitTasks = OrbitLink.suggestions()
         }
         .onTapGesture { goalFocused = false }
     }
@@ -70,7 +87,9 @@ struct StartSessionView: View {
 
     private var goalPanel: some View {
         Panel(radius: 24, padding: 18, fill: 0.11) {
-            Kicker(text: "The goal · your pod sees this", color: Ink.paper(0.42))
+            Kicker(text: orbitTasks.isEmpty ? "The goal · your pod sees this"
+                                           : "The goal · from Orbit · your pod sees this",
+                   color: Ink.paper(0.42))
                 .padding(.bottom, 10)
 
             ZStack(alignment: .leading) {
@@ -87,6 +106,16 @@ struct StartSessionView: View {
                     .submitLabel(.done)
                     .focused($goalFocused)
                     .onSubmit { goalFocused = false }
+                    // Typing over a picked task detaches it. The pod sees
+                    // whatever ends up here either way; what must not happen is
+                    // Orbit being told you spent ninety minutes on a task you
+                    // renamed to something else before sealing.
+                    .onChange(of: goal) { _, text in
+                        if let id = pickedTaskID,
+                           orbitTasks.first(where: { $0.id == id })?.title != text {
+                            pickedTaskID = nil
+                        }
+                    }
             }
             .padding(.bottom, 10)
             .overlay(alignment: .bottom) {
@@ -94,10 +123,25 @@ struct StartSessionView: View {
             }
             .padding(.bottom, 14)
 
-            FlowChips(items: Copy.goalChips, id: \.self) { chip in
-                Chip(label: chip, selected: goal == chip) {
-                    goal = chip
-                    goalFocused = false
+            if orbitTasks.isEmpty {
+                FlowChips(items: Copy.goalChips, id: \.self) { chip in
+                    Chip(label: chip, selected: goal == chip) {
+                        goal = chip
+                        goalFocused = false
+                    }
+                }
+            } else {
+                // Orbit's four, in its order. Tapping one takes its estimate as
+                // well as its name: the point of the bridge is that you stop
+                // re-deciding how long the thing takes at the exact moment you
+                // are looking for a reason not to start.
+                FlowChips(items: orbitTasks, id: \.id) { task in
+                    Chip(label: task.title, selected: pickedTaskID == task.id) {
+                        goal = task.title
+                        minutes = task.minutes
+                        pickedTaskID = task.id
+                        goalFocused = false
+                    }
                 }
             }
         }
@@ -168,30 +212,20 @@ struct StartSessionView: View {
 
     private var appsPanel: some View {
         Panel(radius: 24, padding: 18, fill: 0.11) {
-            HStack(alignment: .firstTextBaseline) {
-                Kicker(text: "Sealed off", color: Ink.paper(0.42))
-                Spacer()
-                Text("\(state.blockedNames.count) of \(state.data.apps.count)")
-                    .font(.ui(11.5))
-                    .foregroundStyle(Ink.paper(0.4))
-                    .monospacedDigit()
-            }
-            .padding(.bottom, 14)
+            Kicker(text: "Sealed off", color: Ink.paper(0.42))
+                .padding(.bottom, 14)
 
-            FlowChips(items: state.data.apps, id: \.id) { app in
-                Chip(label: app.name, selected: app.on, struck: !app.on, icon: "lock.fill") {
-                    state.toggleApp(app)
-                }
-            }
-            .padding(.bottom, 14)
+            // One control, not two. A row of six invented app names used to sit
+            // above this, and the picker's own footnote had to explain that the
+            // chips were decorative — which is a sentence no screen should have
+            // to contain. The picker reports its own count.
+            RealAppPicker()
+                .padding(.bottom, 14)
 
             Text("Calls, maps and your bank still work. You are locked out, not stranded.")
                 .font(.ui(11.5))
                 .foregroundStyle(Ink.paper(0.38))
                 .lineSpacing(2)
-                .padding(.bottom, 14)
-
-            RealAppPicker()
         }
     }
 

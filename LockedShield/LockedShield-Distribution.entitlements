@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- family-controls omitted until Apple approves it for distribution; see
-	     Locked/Locked-Distribution.entitlements. -->
+	<!-- The shield extension draws the block screen, which iOS renders on the
+	     app's behalf — it needs the entitlement too. -->
+	<key>com.apple.developer.family-controls</key>
+	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.aaryanpanchal.locked</string>

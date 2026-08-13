@@ -105,7 +105,7 @@ struct LockedView: View {
     }
 
     private func metaLine(_ session: Session) -> String {
-        let apps = "\(session.blocked.count) app\(session.blocked.count == 1 ? "" : "s") sealed"
+        let apps = "\(session.sealedCount) app\(session.sealedCount == 1 ? "" : "s") sealed"
         let watchers = state.pod.count
         return "\(apps) · \(watchers) \(watchers == 1 ? "person" : "people") watching"
     }

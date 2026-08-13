@@ -61,9 +61,31 @@ final class ModelTests: XCTestCase {
             plannedMinutes: minutes,
             startedAt: start,
             endsAt: start.addingTimeInterval(Double(minutes) * 60),
-            blocked: ["Instagram"],
+            blockedCount: 1,
             stake: .post
         )
+    }
+
+    /// A session written before `blocked: [String]` became `blockedCount: Int?`
+    /// must still decode. `AppData.history` is `[Session]`, so one that throws
+    /// takes the whole file — feed, streak, profile, pending uploads — with it,
+    /// and the app comes back looking factory-fresh.
+    func testASessionFromTheChipListEraStillDecodes() throws {
+        let json = """
+        {"id":"\(UUID().uuidString)","goal":"Work","plannedMinutes":90,
+         "startedAt":"2026-08-01T09:00:00Z","endsAt":"2026-08-01T10:30:00Z",
+         "blocked":["Instagram","TikTok"],"stake":"post","outcome":"completed",
+         "requestsSent":0}
+        """
+        let decoded = try JSONDecoder.iso.decode(Session.self, from: Data(json.utf8))
+
+        XCTAssertEqual(decoded.goal, "Work")
+        XCTAssertEqual(decoded.plannedMinutes, 90)
+        XCTAssertEqual(decoded.outcome, .completed)
+        // The old names are dropped rather than counted: they described a
+        // selection iOS was never enforcing, so inferring "2 apps sealed" from
+        // them would carry the fiction forward.
+        XCTAssertEqual(decoded.sealedCount, 0)
     }
 
     func testRemainingCountsDownAndStopsAtZero() {
@@ -126,17 +148,8 @@ final class ModelTests: XCTestCase {
         XCTAssertGreaterThan(request.secondsLeft, 50)
     }
 
-    // MARK: Global rank
-
-    func testGlobalRankImprovesWithHoursLogged() {
-        var profile = Profile()
-        profile.weeklySeconds = 0
-        let idle = profile.globalRank
-
-        profile.weeklySeconds = 8 * 3_600 + 15 * 60
-        let busy = profile.globalRank
-
-        XCTAssertLessThan(busy, idle, "more hours means a better rank")
-        XCTAssertLessThanOrEqual(profile.globalPercentile, 5, "8h should land near the top")
-    }
+    // `testGlobalRankImprovesWithHoursLogged` was here. It asserted that an
+    // invented number moved in the right direction, which is the kind of test
+    // that makes fiction feel load-bearing. Both it and the thing it tested are
+    // gone.
 }

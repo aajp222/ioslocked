@@ -9,8 +9,12 @@
 # download the .p8 once, then either put it in ~/.appstoreconnect/private_keys/
 # (named AuthKey_<KEYID>.p8) or export the three variables below.
 #
-# The Key ID is already set below. You still need the Issuer ID once:
-#   export ASC_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+# Both the Key ID and Issuer ID are set below, so shipping is one command:
+#
+#   ios/archive.sh --upload
+#
+# Only the .p8 is secret, and it lives in ~/.appstoreconnect/private_keys/.
+# If you rotate the key, change ASC_KEY_ID below and drop the new .p8 there.
 #
 # Each upload needs a build number App Store Connect hasn't seen. This script
 # bumps it from the current time, so you never fight that error.
@@ -67,8 +71,9 @@ if [ "${1:-}" != "--upload" ]; then
 fi
 
 echo "==> Validating with App Store Connect"
-# The key lives in ~/.appstoreconnect/private_keys/AuthKey_S5F9N4N895.p8
+# The key lives in ~/.appstoreconnect/private_keys/AuthKey_<KEYID>.p8
 : "${ASC_KEY_ID:=S5F9N4N895}"
+: "${ASC_ISSUER_ID:=9a4aa604-3fe8-4581-8a3d-0a5c98631a29}"
 
 auth=()
 if [ -n "${ASC_KEY_ID:-}" ] && [ -n "${ASC_ISSUER_ID:-}" ]; then

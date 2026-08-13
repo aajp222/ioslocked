@@ -10,9 +10,14 @@
 	</array>
 	<key>com.apple.developer.family-controls</key>
 	<true/>
+	<!-- Two groups. The first is LOCKED's own, shared with the three
+	     extensions. The second is the Orbit bridge: the app only, never the
+	     extensions — the shield has no business reading a task list, and the
+	     monitor runs when the app is dead and has nothing to say to Orbit. -->
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.aaryanpanchal.locked</string>
+		<string>group.com.aaryanpanchal.orbitlocked</string>
 	</array>
 </dict>
 </plist>
