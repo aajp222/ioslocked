@@ -12,12 +12,47 @@ import Foundation
 /// `AppState`.
 enum OrbitLink {
 
-    /// Whether Orbit is set up to talk to this build at all.
+    /// Whether *this* app holds the shared-container entitlement.
     ///
-    /// Distinct from "has a plan": a provisioned bridge with nothing in it means
-    /// Orbit looked and you have nothing due, which is a real answer. An
-    /// unprovisioned one means the two apps were never introduced.
-    static var isAvailable: Bool { OrbitBridge.isAvailable }
+    /// Deliberately not exposed to the UI. It says nothing about Orbit: LOCKED
+    /// entitles itself, so this is true on a phone that has never had Orbit
+    /// installed. Reporting it as "connected" is exactly the mistake `status`
+    /// exists to prevent — use that instead.
+    private static var containerIsProvisioned: Bool { OrbitBridge.isAvailable }
+
+    /// What the bridge can honestly claim right now.
+    enum Status: Equatable {
+        /// The App Group isn't provisioned to this build. Nothing to be done
+        /// from inside the app; it means a signing problem.
+        case unavailable
+        /// Nobody has ever written a plan here. Orbit isn't installed, or has
+        /// never finished a refresh. Indistinguishable from outside, and the
+        /// advice is the same either way.
+        case noPlan
+        /// Orbit wrote a plan, but not recently enough to lock against.
+        case stale(since: Date)
+        /// Fresh, and Orbit says you have nothing due.
+        case empty
+        /// Fresh, with this many things worth sealing the phone for.
+        case ready(count: Int)
+    }
+
+    /// Derived from a plan value rather than read directly, so every branch is
+    /// reachable in a test. `status` is the convenience that reads the disk.
+    static func status(
+        for plan: OrbitBridge.FocusPlan?,
+        provisioned: Bool,
+        now: Date = Date()
+    ) -> Status {
+        guard provisioned else { return .unavailable }
+        guard let plan else { return .noPlan }
+        guard plan.isFresh(at: now) else { return .stale(since: plan.generatedAt) }
+        return plan.candidates.isEmpty ? .empty : .ready(count: plan.candidates.count)
+    }
+
+    static var status: Status {
+        status(for: OrbitBridge.storedPlan(), provisioned: containerIsProvisioned)
+    }
 
     /// What Orbit thinks is worth sealing the phone for.
     ///

@@ -29,6 +29,51 @@ final class OrbitBridgeTests: XCTestCase {
         )
     }
 
+    // MARK: What we can honestly claim about Orbit
+
+    /// The bug this replaced: the panel keyed off the App Group entitlement,
+    /// which LOCKED grants itself. On a TestFlight phone that had never seen
+    /// Orbit it read "Orbit is connected but has nothing due" — confidently, and
+    /// about an app the tester did not have installed.
+    func testAPhoneWithoutOrbitIsNotReportedAsConnected() {
+        let status = OrbitLink.status(for: nil, provisioned: true)
+        XCTAssertEqual(status, .noPlan)
+    }
+
+    func testAnUnprovisionedContainerOutranksEverythingElse() {
+        let plan = OrbitBridge.FocusPlan(candidates: [
+            .init(id: UUID(), title: "Essay", minutes: 60)
+        ])
+        XCTAssertEqual(OrbitLink.status(for: plan, provisioned: false), .unavailable)
+    }
+
+    /// "Orbit wrote this a week ago" and "Orbit has never written here" need
+    /// opposite advice — open the app, versus install it — so they must not
+    /// collapse into one state.
+    func testStaleIsDistinctFromNeverWritten() {
+        let now = Date()
+        let old = now.addingTimeInterval(-30 * 3600)
+        let plan = OrbitBridge.FocusPlan(generatedAt: old, candidates: [
+            .init(id: UUID(), title: "Essay", minutes: 60)
+        ])
+
+        XCTAssertEqual(OrbitLink.status(for: plan, provisioned: true, now: now), .stale(since: old))
+        XCTAssertNotEqual(OrbitLink.status(for: plan, provisioned: true, now: now), .noPlan)
+    }
+
+    func testFreshAndEmptyMeansOrbitLookedAndFoundNothing() {
+        let plan = OrbitBridge.FocusPlan(candidates: [])
+        XCTAssertEqual(OrbitLink.status(for: plan, provisioned: true), .empty)
+    }
+
+    func testFreshWithTasksReportsHowMany() {
+        let plan = OrbitBridge.FocusPlan(candidates: [
+            .init(id: UUID(), title: "Essay", minutes: 60),
+            .init(id: UUID(), title: "Pset", minutes: 90),
+        ])
+        XCTAssertEqual(OrbitLink.status(for: plan, provisioned: true), .ready(count: 2))
+    }
+
     // MARK: Durations
 
     func testMinutesAreClampedToSomethingLockable() {

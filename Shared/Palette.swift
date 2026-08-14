@@ -66,6 +66,16 @@ enum Fmt {
         date.formatted(.dateTime.hour().minute())
     }
 
+    /// "8 hours ago" / "3 days ago" — for a timestamp whose exact value doesn't
+    /// matter, only its distance. Rounds toward the coarser unit on purpose: if
+    /// you need to know it was 8 hours rather than 7, the sentence containing
+    /// this was the wrong sentence.
+    static func ago(_ date: Date, from now: Date = Date()) -> String {
+        let style = RelativeDateTimeFormatter()
+        style.unitsStyle = .full
+        return style.localizedString(for: date, relativeTo: now)
+    }
+
     static func ordinal(_ n: Int) -> String {
         switch n % 100 {
         case 11, 12, 13: return "th"

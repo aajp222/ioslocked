@@ -516,17 +516,18 @@ struct SettingsView: View {
     /// no tasks in Orbit, and "my tasks aren't showing up" deserves an answer
     /// that isn't a shrug.
     private var orbitPanel: some View {
-        Panel(radius: 24, padding: 18) {
+        let status = OrbitLink.status
+        return Panel(radius: 24, padding: 18) {
             HStack(alignment: .firstTextBaseline) {
                 Kicker(text: "Orbit")
                 Spacer()
-                Text(orbitStatus)
+                Text(orbitStatus(status))
                     .font(.ui(11.5))
-                    .foregroundStyle(OrbitLink.isAvailable ? Ink.gold : Ink.paper(0.4))
+                    .foregroundStyle(orbitIsLive(status) ? Ink.gold : Ink.paper(0.4))
             }
             .padding(.bottom, 10)
 
-            Text(orbitNote)
+            Text(orbitNote(status))
                 .font(.ui(11.5))
                 .foregroundStyle(Ink.paper(0.38))
                 .lineSpacing(2)
@@ -534,19 +535,39 @@ struct SettingsView: View {
         }
     }
 
-    private var orbitStatus: String {
-        guard OrbitLink.isAvailable else { return "Not connected" }
-        let count = OrbitLink.suggestions().count
-        return count == 0 ? "Nothing waiting" : "\(count) task\(count == 1 ? "" : "s")"
+    /// Gold only when Orbit has actually said something recently. A phone that
+    /// has never had Orbit on it must not read as connected — LOCKED holds the
+    /// shared container by itself, so entitlement is not evidence of anything.
+    private func orbitIsLive(_ status: OrbitLink.Status) -> Bool {
+        switch status {
+        case .empty, .ready: return true
+        case .unavailable, .noPlan, .stale: return false
+        }
     }
 
-    private var orbitNote: String {
-        guard OrbitLink.isAvailable else {
-            return "Install Orbit on this phone and its top tasks become your goal options. Nothing leaves the device."
+    private func orbitStatus(_ status: OrbitLink.Status) -> String {
+        switch status {
+        case .unavailable: return "Unavailable"
+        case .noPlan: return "Not connected"
+        case .stale: return "Out of date"
+        case .empty: return "Nothing waiting"
+        case .ready(let count): return "\(count) task\(count == 1 ? "" : "s")"
         }
-        return OrbitLink.suggestions().isEmpty
-            ? "Orbit is connected but has nothing due. Open it to refresh, or type a goal yourself."
-            : "Orbit's top tasks appear as goals when you start a session. Time served goes back to it; nothing else does."
+    }
+
+    private func orbitNote(_ status: OrbitLink.Status) -> String {
+        switch status {
+        case .unavailable:
+            return "This build can't reach the shared container it needs. That's a signing problem, not something you can fix from here."
+        case .noPlan:
+            return "Orbit isn't on this phone, or hasn't finished a refresh yet. With it installed, its top tasks become your goal options — nothing leaves the device."
+        case .stale(let since):
+            return "Orbit last sent something \(Fmt.ago(since)). Open it to refresh; until then you'll get the usual goal list rather than yesterday's priorities."
+        case .empty:
+            return "Orbit is here and says you have nothing due. Type a goal yourself."
+        case .ready:
+            return "Orbit's top tasks appear as goals when you start a session. Time served goes back to it; nothing else does."
+        }
     }
 
     private var notificationsPanel: some View {
