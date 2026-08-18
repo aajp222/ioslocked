@@ -597,20 +597,12 @@ final class AppState: ObservableObject {
         let start = clock()
         let endsAt = start.addingTimeInterval(Double(minutes) * 60)
 
-        // Arm before recording, so the session states what iOS actually did
-        // rather than what was picked. These differ whenever authorization is
-        // missing, and a session claiming "3 apps sealed" while nothing is
-        // sealed is the app telling the pod something untrue on your behalf.
-        // Zero here is the honest answer, and it is visible on the locked
-        // screen, which makes a silent failure findable.
-        let armed = shield.engage(window: start...endsAt)
-
         let session = Session(
             goal: goal.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Work" : goal,
             plannedMinutes: minutes,
             startedAt: start,
             endsAt: endsAt,
-            blockedCount: armed ? sealedCount : 0,
+            blockedCount: sealedCount,
             orbitTaskID: orbitTaskID,
             stake: stake
         )
@@ -622,7 +614,28 @@ final class AppState: ObservableObject {
         outgoing = .none
         completed = nil
 
+        // Publish BEFORE arming. This ordering is the whole difference between
+        // a lock and a countdown.
+        //
+        // `engage` ends by registering a DeviceActivity schedule whose interval
+        // starts now, so iOS calls `intervalDidStart` in the monitor extension
+        // more or less immediately. That extension re-applies the shield from
+        // the snapshot — and if it cannot see a running session it clears the
+        // shield instead, which is correct behaviour for every case except this
+        // one. Arming first meant the extension read a missing or finished
+        // snapshot and wiped the shield the app had just set, microseconds
+        // earlier, from another process. The schedule stayed registered and the
+        // app went on reporting "armed", so the only visible symptom was that
+        // Instagram opened.
         publishSnapshot()
+
+        // Now arm. If iOS refuses, say so rather than recording a count that
+        // describes what was picked instead of what was sealed.
+        let armed = shield.engage(window: start...endsAt)
+        if !armed {
+            data.session?.blockedCount = 0
+            publishSnapshot()
+        }
         if data.liveActivityEnabled {
             live.start(
             goal: session.goal,

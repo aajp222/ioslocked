@@ -33,8 +33,19 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     // MARK: Shield
 
     private func applyShield() {
-        // Don't re-arm over a pod-granted break, or after the session ended.
-        guard let snapshot = SessionSnapshot.load(), snapshot.isRunning, !snapshot.onBreak else {
+        // A snapshot we cannot read is not evidence that the session ended.
+        //
+        // This used to fall through to `clearShield`, which meant any failure
+        // to read — a write that had not landed yet, a transient App Group
+        // problem — unlocked the phone. For an app whose entire claim is that
+        // the block is not yours to remove, an unreadable state must never
+        // resolve to "unlocked". Leave whatever the app set and let the next
+        // interval boundary sort it out.
+        guard let snapshot = SessionSnapshot.load() else { return }
+
+        // A finished session or a pod-granted break are different: both are
+        // positive knowledge that the shield should come down.
+        guard snapshot.isRunning, !snapshot.onBreak else {
             clearShield()
             return
         }
