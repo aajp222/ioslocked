@@ -595,12 +595,22 @@ final class AppState: ObservableObject {
 
     func startSession(goal: String, minutes: Int, stake: Stake, orbitTaskID: UUID? = nil) {
         let start = clock()
+        let endsAt = start.addingTimeInterval(Double(minutes) * 60)
+
+        // Arm before recording, so the session states what iOS actually did
+        // rather than what was picked. These differ whenever authorization is
+        // missing, and a session claiming "3 apps sealed" while nothing is
+        // sealed is the app telling the pod something untrue on your behalf.
+        // Zero here is the honest answer, and it is visible on the locked
+        // screen, which makes a silent failure findable.
+        let armed = shield.engage(window: start...endsAt)
+
         let session = Session(
             goal: goal.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Work" : goal,
             plannedMinutes: minutes,
             startedAt: start,
-            endsAt: start.addingTimeInterval(Double(minutes) * 60),
-            blockedCount: sealedCount,
+            endsAt: endsAt,
+            blockedCount: armed ? sealedCount : 0,
             orbitTaskID: orbitTaskID,
             stake: stake
         )
@@ -612,7 +622,6 @@ final class AppState: ObservableObject {
         outgoing = .none
         completed = nil
 
-        shield.engage(window: session.startedAt...session.endsAt)
         publishSnapshot()
         if data.liveActivityEnabled {
             live.start(

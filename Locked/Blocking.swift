@@ -95,21 +95,47 @@ final class ShieldManager: ObservableObject {
         #endif
     }
 
-    /// Arm the shield for a session.
+    /// Arm the shield for a session. Returns whether iOS is actually enforcing
+    /// anything, so a caller can tell a real lock from the honour system.
     ///
     /// Pass the session window and the monitor extension will re-apply the
     /// shield even if the app is killed, and clear it when the interval ends.
-    func engage(window: ClosedRange<Date>? = nil) {
-        engaged = true
+    ///
+    /// Authorization is re-read first rather than trusted. `state` is a cached
+    /// answer to a question only iOS can settle, and it goes stale the moment
+    /// you grant Screen Time access in Settings while this app is in the
+    /// background — which is the most likely way anyone ever grants it.
+    /// Deciding on the cached value meant refusing to arm a shield the system
+    /// would have allowed, and saying nothing about it.
+    @discardableResult
+    func engage(window: ClosedRange<Date>? = nil) -> Bool {
         #if canImport(FamilyControls)
-        guard state == .ready else { return }
+        refreshState()
+        guard state == .ready else {
+            // Honour system: the session is real, the block is not. `engaged`
+            // says which, and must not claim otherwise.
+            engaged = false
+            return false
+        }
         store.shield.applications = selection.applicationTokens.isEmpty ? nil : selection.applicationTokens
         store.shield.applicationCategories = selection.categoryTokens.isEmpty
             ? nil
             : .specific(selection.categoryTokens)
         store.shield.webDomains = selection.webDomainTokens.isEmpty ? nil : selection.webDomainTokens
         if let window { startMonitoring(window) }
+        engaged = true
+        return true
+        #else
+        engaged = false
+        return false
         #endif
+    }
+
+    /// Re-read the authorization iOS holds, which can change without this app
+    /// running. Cheap, and the answer is the difference between a lock and a
+    /// timer with strong opinions.
+    func refreshAuthorization() {
+        refreshState()
     }
 
     /// Lift it — session over, folded, or on a pod-granted break.

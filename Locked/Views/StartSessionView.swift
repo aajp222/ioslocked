@@ -43,7 +43,27 @@ struct StartSessionView: View {
                 .padding(.bottom, 120)
             }
 
-            VStack(spacing: 0) {
+            VStack(spacing: 8) {
+                // Said before you commit, not after. The locked screen already
+                // admits to the honour system, but by then you have told the
+                // pod you are sealed — and the whole premise is that the block
+                // is not something you can quietly opt out of.
+                if !shield.state.isReal {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 12, weight: .light))
+                        Text(shield.state == .noSelection
+                             ? "Nothing picked yet — this will run on the honour system."
+                             : "iOS won't enforce this: \(shield.state.label.lowercased()).")
+                            .font(.ui(11.5))
+                        Spacer(minLength: 0)
+                    }
+                    .foregroundStyle(Ink.gold)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .goldGlass(14, fill: 0.08, border: 0.3)
+                }
+
                 GoldButton(title: "Lock it", radius: 20, vertical: 17) {
                     Haptics.seal()
                     state.startSession(
@@ -64,6 +84,8 @@ struct StartSessionView: View {
             // Read once, on open. Re-reading while the sheet is up would let
             // the chips change under a finger already moving toward one.
             orbitTasks = OrbitLink.suggestions()
+            // Cheap, and this is the screen where a stale answer costs the most.
+            shield.refreshAuthorization()
         }
         .onTapGesture { goalFocused = false }
     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject private var state: AppState
+    @EnvironmentObject private var shield: ShieldManager
     @Environment(\.scenePhase) private var phase
     @State private var showStart = false
 
@@ -24,6 +25,12 @@ struct RootView: View {
         }
         .onChange(of: phase) { _, newPhase in
             if newPhase == .active {
+                // Screen Time access is almost always granted in Settings, with
+                // this app in the background — so coming back is the one moment
+                // it is worth asking iOS again. Without this the app keeps the
+                // answer it had at launch and stays in honour-system mode until
+                // it is force-quit and reopened, long after you fixed it.
+                shield.refreshAuthorization()
                 state.refresh()
             } else {
                 state.saveNow()
