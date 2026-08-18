@@ -51,6 +51,9 @@ struct SettingsView: View {
                     stakesPanel
                     podPanel
                     blockingPanel
+                    #if DEBUG
+                    shieldDiagnostics
+                    #endif
                     orbitPanel
                     notificationsPanel
                     devPanel
@@ -509,6 +512,56 @@ struct SettingsView: View {
             RealAppPicker()
         }
     }
+
+    #if DEBUG
+    /// Debug builds only, so this never reaches a tester's Settings screen.
+    ///
+    /// Reads back what iOS currently holds rather than what the app believes it
+    /// set. "Real blocking armed" is a claim about `state`; `shield.apps` below
+    /// is the system's own answer, and when those two disagree the disagreement
+    /// is the bug.
+    private var shieldDiagnostics: some View {
+        Panel(radius: 24, padding: 18) {
+            Kicker(text: "Shield diagnostics · debug")
+                .padding(.bottom, 12)
+
+            VStack(alignment: .leading, spacing: 7) {
+                diagnosticRow("auth", shield.authorizationDescription)
+                diagnosticRow("picked", shield.selectionCounts)
+                diagnosticRow("shield.apps", shield.shieldedApplicationCount.map(String.init) ?? "nil — NOTHING SHIELDED")
+                diagnosticRow("shield.cats", shield.shieldedCategoryDescription)
+                diagnosticRow("schedules", shield.activeSchedules.isEmpty ? "none" : shield.activeSchedules.joined(separator: ", "))
+                diagnosticRow("app group", shield.groupRoundTrip)
+                if let error = shield.lastAuthorizationError {
+                    diagnosticRow("last error", error)
+                }
+            }
+
+            Text("If state says armed while shield.apps is nil, the shield was written and then removed — most likely by the monitor extension's intervalDidEnd.")
+                .font(.ui(11))
+                .foregroundStyle(Ink.paper(0.38))
+                .lineSpacing(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 12)
+        }
+    }
+
+    private func diagnosticRow(_ label: String, _ value: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text(label)
+                .font(.ui(11))
+                .foregroundStyle(Ink.paper(0.4))
+                .frame(width: 78, alignment: .leading)
+            Text(value)
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(value.contains("NOTHING") || value.contains("MISMATCH") || value.contains("won't")
+                                 ? Ink.gold : Ink.paper(0.75))
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+    }
+    #endif
 
     /// Read-only, and deliberately so. There is nothing to configure — the
     /// bridge is on when both apps are installed and off otherwise. It exists

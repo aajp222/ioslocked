@@ -83,13 +83,20 @@ final class ShieldManager: ObservableObject {
         #endif
     }
 
+    /// The last thing Family Controls said when it refused. Kept because the
+    /// reasons are genuinely different — a Managed Apple ID, a Screen Time
+    /// passcode someone else set, a child account, a missing entitlement — and
+    /// they need different answers. Throwing this away and reporting "not
+    /// granted" for all of them turns a five-second fix into an afternoon.
+    @Published private(set) var lastAuthorizationError: String?
+
     func requestAuthorization() async {
         #if canImport(FamilyControls)
         do {
             try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
+            lastAuthorizationError = nil
         } catch {
-            // Missing entitlement, a Managed Apple ID restriction, or the user
-            // said no. Either way we stay in honour-system mode.
+            lastAuthorizationError = String(describing: error)
         }
         refreshState()
         #endif
@@ -173,6 +180,82 @@ final class ShieldManager: ObservableObject {
         try? center.startMonitoring(name, during: schedule)
     }
     #endif
+
+    // MARK: Diagnostics
+    //
+    // Everything here reads back what the system currently holds rather than
+    // what this app believes it set. That distinction is the whole point: the
+    // app can report "armed" while `ManagedSettingsStore` holds nothing,
+    // because writing a shield and a shield existing are different events and
+    // nothing in between reports failure.
+
+    /// What `ManagedSettingsStore` says is shielded *right now*, read back out
+    /// of the store rather than from `selection`. Nil means nothing is shielded.
+    var shieldedApplicationCount: Int? {
+        #if canImport(FamilyControls)
+        store.shield.applications?.count
+        #else
+        nil
+        #endif
+    }
+
+    var shieldedCategoryDescription: String {
+        #if canImport(FamilyControls)
+        switch store.shield.applicationCategories {
+        case .none: return "none"
+        case .some(.all): return "all"
+        case .some(.specific(let set, except: _)): return "\(set.count) specific"
+        @unknown default: return "unknown"
+        }
+        #else
+        return "unsupported"
+        #endif
+    }
+
+    /// DeviceActivity schedules iOS is currently monitoring. If ours is absent
+    /// mid-session the backstop is not running; if it is present but the shield
+    /// is empty, the extension has cleared it.
+    var activeSchedules: [String] {
+        #if canImport(FamilyControls)
+        center.activities.map(\.rawValue)
+        #else
+        []
+        #endif
+    }
+
+    var authorizationDescription: String {
+        #if canImport(FamilyControls)
+        return "\(AuthorizationCenter.shared.authorizationStatus)"
+        #else
+        return "unsupported"
+        #endif
+    }
+
+    var selectionCounts: String {
+        #if canImport(FamilyControls)
+        return "\(selection.applicationTokens.count) apps · \(selection.categoryTokens.count) cats · \(selection.webDomainTokens.count) web"
+        #else
+        return "unsupported"
+        #endif
+    }
+
+    /// Whether the tokens survive a trip through the App Group store — the
+    /// thing the monitor extension depends on, and the thing the recurring
+    /// CFPrefs complaint would break.
+    var groupRoundTrip: String {
+        #if canImport(FamilyControls)
+        guard let data = LockedShared.defaults.data(forKey: LockedShared.selectionKey) else {
+            return "nothing stored"
+        }
+        guard let restored = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) else {
+            return "stored but won't decode (\(data.count) bytes)"
+        }
+        let n = restored.applicationTokens.count + restored.categoryTokens.count
+        return n == selectedCount ? "ok (\(n))" : "MISMATCH: group \(n) vs live \(selectedCount)"
+        #else
+        return "unsupported"
+        #endif
+    }
 
     private func refreshState() {
         #if canImport(FamilyControls)
