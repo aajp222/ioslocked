@@ -46,6 +46,17 @@ struct LockedView: View {
                             .padding(.bottom, 12)
                     }
 
+                    #if DEBUG
+                    // The same read-back that lives in Settings, except here —
+                    // which is the only screen you can see while a session is
+                    // running, and therefore the only place the answer means
+                    // anything. Settings sits behind TodayView, which only
+                    // exists when there is no session, so a shield read there
+                    // is always nil and always correct.
+                    shieldReadBack
+                        .padding(.bottom, 12)
+                    #endif
+
                     GlassButton(title: begTitle(session)) {
                         state.compose()
                     }
@@ -109,6 +120,27 @@ struct LockedView: View {
         let watchers = state.pod.count
         return "\(apps) · \(watchers) \(watchers == 1 ? "person" : "people") watching"
     }
+
+    #if DEBUG
+    /// What iOS is holding, mid-session. `apps` should be non-nil the whole
+    /// time a session runs; if it goes nil while the clock is still going,
+    /// something cleared it after `engage` set it.
+    private var shieldReadBack: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("apps \(shield.shieldedApplicationCount.map(String.init) ?? "nil")  ·  cats \(shield.shieldedCategoryDescription)")
+            Text("picked \(shield.selectionCounts)")
+            Text("sched \(shield.activeSchedules.isEmpty ? "none" : shield.activeSchedules.joined(separator: ","))")
+        }
+        .font(.system(size: 10, design: .monospaced))
+        .foregroundStyle(shield.shieldedApplicationCount == nil ? Ink.gold : Ink.paper(0.4))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(.white.opacity(0.04))
+        }
+    }
+    #endif
 
     private var watchers: some View {
         HStack(spacing: -8) {
