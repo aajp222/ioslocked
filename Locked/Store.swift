@@ -33,6 +33,14 @@ final class AppState: ObservableObject {
     @Published var completed: Session? = nil
     @Published var showSettings = false
 
+    /// A code that arrived by link and is waiting for you to say yes.
+    ///
+    /// Deliberately *pending* rather than applied. Invite links get forwarded
+    /// into group chats and screenshotted, and joining a pod means strangers
+    /// start seeing what you claimed you would do and whether you folded. A
+    /// tap on a link is not consent to that; the confirmation is.
+    @Published var pendingInvite: String? = nil
+
     /// The Lock Screen / Dynamic Island countdown.
     let live = LiveActivityController()
 
@@ -255,6 +263,18 @@ final class AppState: ObservableObject {
         uploadPushToken()
         syncTask?.cancel()
         syncTask = Task { [weak self] in await self?.sync(force: true) }
+
+        // The invite that was waiting on an account now has one. Only raised
+        // again when this connect did not itself land us in a pod — otherwise
+        // accepting an invite would immediately offer the same invite back.
+        if let waiting = data.deferredInvite, !config.isInPod {
+            data.deferredInvite = nil
+            pendingInvite = waiting
+            save()
+        } else if config.isInPod, data.deferredInvite != nil {
+            data.deferredInvite = nil
+            save()
+        }
     }
 
     /// Step out of the pod on the server, then fall back to the simulated one.
@@ -308,6 +328,30 @@ final class AppState: ObservableObject {
         Task { [service] in
             await service.registerDevice(token: token, environment: Notifier.pushEnvironment)
         }
+    }
+
+    /// Someone tapped an invite link. Holds the code up for confirmation; it
+    /// never joins on its own — see `pendingInvite`.
+    func receiveInvite(_ code: String) {
+        guard session == nil else {
+            // Mid-session the whole UI is the lock screen. Swapping pods from
+            // under a running session would change who is watching it halfway
+            // through, so this waits rather than interrupting.
+            return
+        }
+        pendingInvite = code
+        Haptics.select()
+    }
+
+    func dismissInvite() {
+        pendingInvite = nil
+    }
+
+    /// Put an invite aside until there is an account to use it with.
+    func deferInvite(_ code: String) {
+        data.deferredInvite = code
+        pendingInvite = nil
+        save()
     }
 
     /// A notification tap, or one of its buttons. The app may have been launched

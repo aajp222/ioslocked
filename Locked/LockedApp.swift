@@ -32,6 +32,14 @@ struct LockedApp: App {
                     AppDelegate.state = state
                     Notifier.registerForRemoteNotifications()
                 }
+                .onOpenURL { url in
+                    // Only invite links so far. A link never acts on its own —
+                    // it puts the code up for confirmation. Anything we do not
+                    // recognise opens the app and does nothing, which is the
+                    // right outcome for a scheme anyone can construct.
+                    guard let code = InviteLink.code(from: url) else { return }
+                    state.receiveInvite(code)
+                }
         }
     }
 }

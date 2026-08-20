@@ -82,6 +82,12 @@ targets:
         # HTTPS only, which is exempt — this stops App Store Connect asking
         # about export compliance on every upload.
         ITSAppUsesNonExemptEncryption: false
+        # locked:// — invite links, and the Orbit hand-off. Registered here
+        # rather than in Info.plist because XcodeGen generates that file and
+        # would discard the edit on the next run.
+        CFBundleURLTypes:
+          - CFBundleURLName: com.aaryanpanchal.locked
+            CFBundleURLSchemes: [locked]
 
     settings:
       base:

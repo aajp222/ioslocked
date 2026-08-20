@@ -309,6 +309,13 @@ struct AppData: Codable {
     var dayStamp: Date = Date()
     var weekStamp: Date = Date()
     var notificationsAsked = false
+    /// An invite that arrived before there was an account to accept it with.
+    ///
+    /// Persisted, because the journey between tapping the link and finishing
+    /// Sign in with Apple leaves the app — and coming back to a settings screen
+    /// having forgotten why you opened it is exactly how an invite gets lost
+    /// one step short of the thing it was for.
+    var deferredInvite: String? = nil
     /// How far through the server's event log we've read.
     var feedCursor: Int = 0
     /// Finished sessions the server hasn't accepted yet. Hours are the product;

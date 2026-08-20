@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		012C512AA41557547FAEF8FB /* InviteLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D96D8E7A2FA9F2E886E0AE /* InviteLinkTests.swift */; };
 		0446BDC408A13B0B8292518B /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641B3344CC909360BC124EAE /* Store.swift */; };
 		1933A2FEFD601646C43C150D /* StartSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B35A99023DEBE37F2793C42 /* StartSessionView.swift */; };
 		1DC6A7FA33E093AF5429FB46 /* Palette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E80C59C526FD8F076C8631 /* Palette.swift */; };
@@ -36,6 +37,7 @@
 		6B3FAD12D50374355457430F /* LockedShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACD5C25D8F6D8F186AEDA82 /* LockedShared.swift */; };
 		73AC1AB88D3950AF106AC66A /* DeviceActivityMonitorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D563C36762ECBB9F603C5532 /* DeviceActivityMonitorExtension.swift */; };
 		74FB05232D6464951DCF079D /* PodService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603E51E4575AA09BE15F3216 /* PodService.swift */; };
+		7717967126A85B85D3BB4D18 /* InviteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7520D22D3D714E06A8EBCBAE /* InviteSheet.swift */; };
 		78AF86E7452A7D76F4F740C3 /* LockedActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B626FA10BCD2A6B013ADE7 /* LockedActivity.swift */; };
 		78CCD4561B541235A7AF24A2 /* StandingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01272228C0DD74D96ADEE296 /* StandingsView.swift */; };
 		796B8A5B946A3948AE8C9C07 /* Blocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DF8609606754845750A0FD /* Blocking.swift */; };
@@ -63,6 +65,7 @@
 		F5918440537DF8D3520F91B9 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56921F87E88407E4749457EF /* OnboardingView.swift */; };
 		F5CD6D0C368C46A16BD6DBE5 /* LockedShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACD5C25D8F6D8F186AEDA82 /* LockedShared.swift */; };
 		F676E9963B9FC0CBD8EFF1EF /* LockedShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACD5C25D8F6D8F186AEDA82 /* LockedShared.swift */; };
+		FA5B3C3373918329D477043A /* InviteLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C699E7EE29457CA675F41D9F /* InviteLink.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +144,7 @@
 		641B3344CC909360BC124EAE /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		6B35A99023DEBE37F2793C42 /* StartSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartSessionView.swift; sourceTree = "<group>"; };
 		726BBBEE8C16C627B8507C58 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
+		7520D22D3D714E06A8EBCBAE /* InviteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteSheet.swift; sourceTree = "<group>"; };
 		76332E7F463EB739FC405F70 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		77B626FA10BCD2A6B013ADE7 /* LockedActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockedActivity.swift; sourceTree = "<group>"; };
 		77F96E80ACEE7BF5D60E4F8F /* ManagedSettingsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettingsUI.framework; path = System/Library/Frameworks/ManagedSettingsUI.framework; sourceTree = SDKROOT; };
@@ -151,12 +155,14 @@
 		88E80C59C526FD8F076C8631 /* Palette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Palette.swift; sourceTree = "<group>"; };
 		8E2BEC2B39F6A155210D0C6D /* LockedWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LockedWidgets.entitlements; sourceTree = "<group>"; };
 		93459C34671E0E000958532E /* OrbitBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitBridge.swift; sourceTree = "<group>"; };
+		93D96D8E7A2FA9F2E886E0AE /* InviteLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteLinkTests.swift; sourceTree = "<group>"; };
 		963D776EF27C4AC00CA83D82 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
 		96A7298673CA7BC9F049A2C0 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 		A33B1E395A35E5E0FB177041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AACD5C25D8F6D8F186AEDA82 /* LockedShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockedShared.swift; sourceTree = "<group>"; };
 		B7968F8C126B3A8999F13E0C /* PushHandlingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushHandlingTests.swift; sourceTree = "<group>"; };
 		BBB49EF4436DC469D3587C7D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		C699E7EE29457CA675F41D9F /* InviteLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteLink.swift; sourceTree = "<group>"; };
 		CB52E8A1A837955A4A7D8DFE /* LockedMonitor.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = LockedMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D563C36762ECBB9F603C5532 /* DeviceActivityMonitorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceActivityMonitorExtension.swift; sourceTree = "<group>"; };
 		DDF3D2EAE99270B379F55C2C /* LockedWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = LockedWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -265,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				963D776EF27C4AC00CA83D82 /* AppStateTests.swift */,
+				93D96D8E7A2FA9F2E886E0AE /* InviteLinkTests.swift */,
 				726BBBEE8C16C627B8507C58 /* ModelTests.swift */,
 				867CEB8A2606C8FD0B2FD0EB /* OrbitBridgeTests.swift */,
 				B7968F8C126B3A8999F13E0C /* PushHandlingTests.swift */,
@@ -343,6 +350,7 @@
 				16DF8609606754845750A0FD /* Blocking.swift */,
 				76332E7F463EB739FC405F70 /* Haptics.swift */,
 				A33B1E395A35E5E0FB177041 /* Info.plist */,
+				C699E7EE29457CA675F41D9F /* InviteLink.swift */,
 				23EF283C601DC5170713E632 /* LiveActivityController.swift */,
 				F99753D260C7A63CE8731CFB /* Locked-Distribution.entitlements */,
 				22D8DA6E9FD71063105C0855 /* Locked.entitlements */,
@@ -365,6 +373,7 @@
 				F54E1DF886E2636738DBA561 /* Components.swift */,
 				ECB5C6CDBE854E1443BB1CA3 /* FeedView.swift */,
 				48DCBC4EBD4494EB1F718BFE /* IncomingRequestView.swift */,
+				7520D22D3D714E06A8EBCBAE /* InviteSheet.swift */,
 				25B5CAFCB2E204C57196448D /* LockedView.swift */,
 				56921F87E88407E4749457EF /* OnboardingView.swift */,
 				282418E01A087EDF909E8321 /* RootView.swift */,
@@ -577,6 +586,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAEB0C2C9773C3227DCA6B15 /* AppStateTests.swift in Sources */,
+				012C512AA41557547FAEF8FB /* InviteLinkTests.swift in Sources */,
 				5D27D87565EC43E0964FB1DA /* ModelTests.swift in Sources */,
 				5379EC29FDB4F7BCFDBF95DA /* OrbitBridgeTests.swift in Sources */,
 				DAEBC00C6C9AAE8C9ED8490E /* PushHandlingTests.swift in Sources */,
@@ -592,6 +602,8 @@
 				561E79961CCBB8901E3A3ACA /* FeedView.swift in Sources */,
 				B4D229719E8942731549DAEC /* Haptics.swift in Sources */,
 				C4E858BAED431244785943F9 /* IncomingRequestView.swift in Sources */,
+				FA5B3C3373918329D477043A /* InviteLink.swift in Sources */,
+				7717967126A85B85D3BB4D18 /* InviteSheet.swift in Sources */,
 				F2FFBB4D18419D97E201746A /* LiveActivityController.swift in Sources */,
 				78AF86E7452A7D76F4F740C3 /* LockedActivity.swift in Sources */,
 				91FE6AC768F88A80CB99BC84 /* LockedApp.swift in Sources */,

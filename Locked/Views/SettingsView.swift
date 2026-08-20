@@ -256,6 +256,27 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                 }
+
+                // The six characters above are the last removable step in
+                // getting somebody in, and they come after two favours already
+                // asked. A link removes them.
+                if let code = config.inviteCode,
+                   let text = InviteLink.shareText(code: code, podName: config.podName) {
+                    ShareLink(item: text) {
+                        HStack(spacing: 7) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: 12, weight: .medium))
+                            Text("Send an invite link")
+                                .font(.ui(12.5, .medium))
+                        }
+                        .foregroundStyle(Ink.goldType)
+                        .padding(.horizontal, 13)
+                        .padding(.vertical, 9)
+                        .goldGlass(13, fill: 0.14, border: 0.36)
+                    }
+                    .padding(.top, 4)
+                }
+
                 Text("Anyone who enters this joins \(config.podName ?? "your pod") and starts seeing your sessions.")
                     .font(.ui(11.5))
                     .foregroundStyle(Ink.paper(0.4))

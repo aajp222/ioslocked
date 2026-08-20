@@ -23,6 +23,12 @@ struct RootView: View {
         .sheet(isPresented: $state.showSettings) {
             SettingsView()
         }
+        .sheet(item: Binding(
+            get: { state.pendingInvite.map(Invitation.init) },
+            set: { if $0 == nil { state.dismissInvite() } }
+        )) { invitation in
+            InviteSheet(code: invitation.code)
+        }
         .onChange(of: phase) { _, newPhase in
             if newPhase == .active {
                 // Screen Time access is almost always granted in Settings, with
@@ -129,4 +135,11 @@ struct CompletionOverlay: View {
         .padding(.vertical, 14)
         .glass(18, fill: 0.1, border: 0.13)
     }
+}
+
+
+/// `sheet(item:)` needs something Identifiable, and a bare code string is not.
+private struct Invitation: Identifiable {
+    let code: String
+    var id: String { code }
 }
