@@ -24,6 +24,7 @@
 		4A559837A9EE232C209F7602 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4AC8FEF912182067798C4A0 /* DeviceActivity.framework */; };
 		4DDB45C76ED20C2FFFB491F9 /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B8B5CFE75DC4C160478F13 /* FamilyControls.framework */; };
 		4FDD04D1B582AB30634CD179 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A7298673CA7BC9F049A2C0 /* ManagedSettings.framework */; };
+		5034629C79AE1D03D6ED6B3C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5679D4C1EEC0253ACEA1901B /* Assets.xcassets */; };
 		5379EC29FDB4F7BCFDBF95DA /* OrbitBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867CEB8A2606C8FD0B2FD0EB /* OrbitBridgeTests.swift */; };
 		5578338933D8E6D5E07B21EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4A858FBA5D3CB32059055B88 /* Assets.xcassets */; };
 		561E79961CCBB8901E3A3ACA /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB5C6CDBE854E1443BB1CA3 /* FeedView.swift */; };
@@ -137,6 +138,7 @@
 		4A858FBA5D3CB32059055B88 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4F4C2BDEF28E405B1D30029E /* LockedShield.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = LockedShield.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5464C95A261B9378324BAD28 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		5679D4C1EEC0253ACEA1901B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		56921F87E88407E4749457EF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		603E51E4575AA09BE15F3216 /* PodService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodService.swift; sourceTree = "<group>"; };
 		60B8B5CFE75DC4C160478F13 /* FamilyControls.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FamilyControls.framework; path = System/Library/Frameworks/FamilyControls.framework; sourceTree = SDKROOT; };
@@ -313,6 +315,7 @@
 		85CBECC30C5A8A16ACC851A4 /* LockedShield */ = {
 			isa = PBXGroup;
 			children = (
+				5679D4C1EEC0253ACEA1901B /* Assets.xcassets */,
 				F2D4F8579F58F882A14270CE /* Info.plist */,
 				062FBD5271BD168718354AFB /* LockedShield-Distribution.entitlements */,
 				02D3BD716F3E72158F973087 /* LockedShield.entitlements */,
@@ -393,6 +396,7 @@
 			buildConfigurationList = 1C45CE459547315BA035848D /* Build configuration list for PBXNativeTarget "LockedShield" */;
 			buildPhases = (
 				45E3954B6A6E7DF969912C60 /* Sources */,
+				1463E20C447CD0067EE9323A /* Resources */,
 				9C4E457685D03EFBA369CB47 /* Frameworks */,
 			);
 			buildRules = (
@@ -538,6 +542,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1463E20C447CD0067EE9323A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5034629C79AE1D03D6ED6B3C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1B87CCEDAF2C7AB6B6F9D46A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;

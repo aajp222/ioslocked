@@ -33,7 +33,11 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
         return ShieldConfiguration(
             backgroundBlurStyle: .systemUltraThinMaterialDark,
             backgroundColor: UIColor(Color(hex: Hex.groundDeep, alpha: 0.94)),
-            icon: UIImage(systemName: "lock"),
+            // The brand lock, from this extension's own asset catalog — an
+            // extension cannot read the app's. The SF Symbol stays as the
+            // fallback so a missing asset degrades to a lock, never to a blank
+            // wall at the one moment the app most needs to look deliberate.
+            icon: UIImage(named: "LockGlyph") ?? UIImage(systemName: "lock"),
             title: ShieldConfiguration.Label(
                 text: title(snapshot),
                 color: UIColor(Ink.paper)
